@@ -1,7 +1,6 @@
 {
-  "name": "minecraft-launcher-core",
-  "version": "3.18.1",
-  "description": "Lightweight module that downloads and runs Minecraft using javascript / NodeJS",
+  "name": "cavespidercore",
+  "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
     "adm-zip": "^0.4.13",
@@ -22,21 +21,9 @@
   "scripts": {
     "test": "eslint ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Pierce01/MinecraftLauncher-core.git"
-  },
-  "keywords": [
-    "minecraft",
-    "minecraft-launcher-node",
-    "minecraft-launcher",
-    "launcher",
-    "minecraft-forge"
+  "authors": [
+    "Pierce Harriz",
+    "Jonas F. Franke <jonasfranke@sdevs.org>"
   ],
-  "author": "Pierce Harriz",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Pierce01/MinecraftLauncher-core/issues"
-  },
-  "homepage": "https://github.com/Pierce01/MinecraftLauncher-core#readme"
+  "license": "MIT"
 }

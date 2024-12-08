@@ -69,7 +69,7 @@ declare module "minecraft-launcher-core" {
       fallbackMaven?: string;
     };
     /**
-     * Version of the ForgeWrapper which MCLC uses. This allows us to launch modern Forge.
+     * Version of the ForgeWrapper which CaveSpider Core uses. This allows us to launch modern Forge.
      */
     fw?: {
       baseUrl?: string;
@@ -86,7 +86,7 @@ declare module "minecraft-launcher-core" {
      */
     clientPackage?: string;
     /**
-     * if true MCLC will remove the client package zip file after its finished extracting.
+     * if true CaveSpider Core will remove the client package zip file after its finished extracting.
      */
     removePackage?: boolean;
     /**
@@ -129,7 +129,7 @@ declare module "minecraft-launcher-core" {
       /**
        * 	The name of the folder, jar file, and version json in the version folder. 
        * 
-       * ` MCLC will look in the `versions` folder for this name
+       * ` CaveSpider Core will look in the `versions` folder for this name
        * @example '1.16.4-fabric'
        */
       custom?: string;

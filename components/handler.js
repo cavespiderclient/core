@@ -25,7 +25,7 @@ class Handler {
             message: error
           })
         } else {
-          this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
+          this.client.emit('debug', `[CaveSpider Core]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
           resolve({
             run: true
           })
@@ -45,7 +45,7 @@ class Handler {
 
       _request.on('response', (data) => {
         if (data.statusCode === 404) {
-          this.client.emit('debug', `[MCLC]: Failed to download ${url} due to: File not found...`)
+          this.client.emit('debug', `[CaveSpider Core]: Failed to download ${url} due to: File not found...`)
           return resolve(false)
         }
 
@@ -53,7 +53,7 @@ class Handler {
       })
 
       _request.on('error', async (error) => {
-        this.client.emit('debug', `[MCLC]: Failed to download asset to ${path.join(directory, name)} due to\n${error}.` +
+        this.client.emit('debug', `[CaveSpider Core]: Failed to download asset to ${path.join(directory, name)} due to\n${error}.` +
                     ` Retrying... ${retry}`)
         if (retry) await this.downloadAsync(url, directory, name, false, type)
         resolve()
@@ -81,7 +81,7 @@ class Handler {
       })
 
       file.on('error', async (e) => {
-        this.client.emit('debug', `[MCLC]: Failed to download asset to ${path.join(directory, name)} due to\n${e}.` +
+        this.client.emit('debug', `[CaveSpider Core]: Failed to download asset to ${path.join(directory, name)} due to\n${e}.` +
                     ` Retrying... ${retry}`)
         if (fs.existsSync(path.join(directory, name))) fs.unlinkSync(path.join(directory, name))
         if (retry) await this.downloadAsync(url, directory, name, false, type)
@@ -94,7 +94,7 @@ class Handler {
     return new Promise((resolve, reject) => {
       checksum.file(file, (err, sum) => {
         if (err) {
-          this.client.emit('debug', `[MCLC]: Failed to check file hash due to ${err}`)
+          this.client.emit('debug', `[CaveSpider Core]: Failed to check file hash due to ${err}`)
           return resolve(false)
         }
         return resolve(hash === sum)
@@ -117,11 +117,11 @@ class Handler {
         if (!error) {
           if (!fs.existsSync(cache)) {
             fs.mkdirSync(cache, { recursive: true })
-            this.client.emit('debug', '[MCLC]: Cache directory created.')
+            this.client.emit('debug', '[CaveSpider Core]: Cache directory created.')
           }
           fs.writeFile(path.join(`${cache}/version_manifest.json`), body, (err) => {
             if (err) return resolve(err)
-            this.client.emit('debug', '[MCLC]: Cached version_manifest.json')
+            this.client.emit('debug', '[CaveSpider Core]: Cached version_manifest.json')
           })
         }
         const parsed = (error && error.code === 'ENOTFOUND')
@@ -134,11 +134,11 @@ class Handler {
             if (!error) {
               fs.writeFile(path.join(`${cache}/${this.options.version.number}.json`), body, (err) => {
                 if (err) throw Error(err)
-                this.client.emit('debug', `[MCLC]: Cached ${this.options.version.number}.json`)
+                this.client.emit('debug', `[CaveSpider Core]: Cached ${this.options.version.number}.json`)
               })
             }
 
-            this.client.emit('debug', '[MCLC]: Parsed version from version manifest')
+            this.client.emit('debug', '[CaveSpider Core]: Parsed version from version manifest')
             this.version = error && error.code === 'ENOTFOUND'
               ? JSON.parse(fs.readFileSync(`${cache}/${this.options.version.number}.json`))
               : JSON.parse(body)
@@ -154,7 +154,7 @@ class Handler {
   async getJar () {
     await this.downloadAsync(this.version.downloads.client.url, this.options.directory, `${this.options.version.custom ? this.options.version.custom : this.options.version.number}.jar`, true, 'version-jar')
     fs.writeFileSync(path.join(this.options.directory, `${this.options.version.number}.json`), JSON.stringify(this.version, null, 4))
-    return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
+    return this.client.emit('debug', '[CaveSpider Core]: Downloaded version jar and wrote version json')
   }
 
   async getAssets () {
@@ -192,13 +192,13 @@ class Handler {
     // Copy assets to legacy if it's an older Minecraft version.
     if (this.isLegacy()) {
       if (fs.existsSync(path.join(assetDirectory, 'legacy'))) {
-        this.client.emit('debug', '[MCLC]: The \'legacy\' directory is no longer used as Minecraft looks ' +
+        this.client.emit('debug', '[CaveSpider Core]: The \'legacy\' directory is no longer used as Minecraft looks ' +
           'for the resouces folder regardless of what is passed in the assetDirecotry launch option. I\'d ' +
           `recommend removing the directory (${path.join(assetDirectory, 'legacy')})`)
       }
 
       const legacyDirectory = path.join(this.options.root, 'resources')
-      this.client.emit('debug', `[MCLC]: Copying assets over to ${legacyDirectory}`)
+      this.client.emit('debug', `[CaveSpider Core]: Copying assets over to ${legacyDirectory}`)
 
       this.client.emit('progress', {
         type: 'assets-copy',
@@ -231,7 +231,7 @@ class Handler {
     }
     counter = 0
 
-    this.client.emit('debug', '[MCLC]: Downloaded assets')
+    this.client.emit('debug', '[CaveSpider Core]: Downloaded assets')
   }
 
   parseRule (lib) {
@@ -302,11 +302,11 @@ class Handler {
           total: stat.length
         })
       }))
-      this.client.emit('debug', '[MCLC]: Downloaded and extracted natives')
+      this.client.emit('debug', '[CaveSpider Core]: Downloaded and extracted natives')
     }
 
     counter = 0
-    this.client.emit('debug', `[MCLC]: Set native path to ${nativeDirectory}`)
+    this.client.emit('debug', `[CaveSpider Core]: Set native path to ${nativeDirectory}`)
 
     return nativeDirectory
   }
@@ -330,15 +330,12 @@ class Handler {
     let json = null
     let installerJson = null
     const versionPath = path.join(this.options.root, 'forge', `${this.version.id}`, 'version.json')
-    // Since we're building a proper "custom" JSON that will work nativly with MCLC, the version JSON will not
-    // be re-generated on the next run.
     if (fs.existsSync(versionPath)) {
       try {
         json = JSON.parse(fs.readFileSync(versionPath))
         if (!json.forgeWrapperVersion || !(json.forgeWrapperVersion === this.options.overrides.fw.version)) {
-          this.client.emit('debug', '[MCLC]: Old ForgeWrapper has generated this version JSON, re-generating')
+          this.client.emit('debug', '[CaveSpider Core]: Old ForgeWrapper has generated this version JSON, re-generating')
         } else {
-          // If forge is modern, add ForgeWrappers launch arguments and set forge to null so MCLC treats it as a custom json.
           if (this.isModernForge(json)) {
             this.fwAddArgs()
             this.options.forge = null
@@ -347,11 +344,11 @@ class Handler {
         }
       } catch (e) {
         console.warn(e)
-        this.client.emit('debug', '[MCLC]: Failed to parse Forge version JSON, re-generating')
+        this.client.emit('debug', '[CaveSpider Core]: Failed to parse Forge version JSON, re-generating')
       }
     }
 
-    this.client.emit('debug', '[MCLC]: Generating Forge version json, this might take a bit')
+    this.client.emit('debug', '[CaveSpider Core]: Generating Forge version json, this might take a bit')
     const zipFile = new Zip(this.options.forge)
     json = zipFile.readAsText('version.json')
     if (zipFile.getEntry('install_profile.json')) installerJson = zipFile.readAsText('install_profile.json')
@@ -360,21 +357,17 @@ class Handler {
       json = JSON.parse(json)
       if (installerJson) installerJson = JSON.parse(installerJson)
     } catch (e) {
-      this.client.emit('debug', '[MCLC]: Failed to load json files for ForgeWrapper, using Vanilla instead')
+      this.client.emit('debug', '[CaveSpider Core]: Failed to load json files for ForgeWrapper, using Vanilla instead')
       return null
     }
-    // Adding the installer libraries as mavenFiles so MCLC downloads them but doesn't add them to the class paths.
     if (installerJson) {
       json.mavenFiles
         ? json.mavenFiles = json.mavenFiles.concat(installerJson.libraries)
         : json.mavenFiles = installerJson.libraries
     }
 
-    // Holder for the specifc jar ending which depends on the specifc forge version.
     let jarEnding = 'universal'
-    // We need to handle modern forge differently than legacy.
     if (this.isModernForge(json)) {
-      // If forge is modern and above 1.12.2, we add ForgeWrapper to the libraries so MCLC includes it in the classpaths.
       if (json.inheritsFrom !== '1.12.2') {
         this.fwAddArgs()
         const fwName = `ForgeWrapper-${this.options.overrides.fw.version}.jar`
@@ -393,7 +386,6 @@ class Handler {
         json.mainClass = 'io.github.zekerzhayard.forgewrapper.installer.Main'
         jarEnding = 'launcher'
 
-        // Providing a download URL to the universal jar mavenFile so it can be downloaded properly.
         for (const library of json.mavenFiles) {
           const lib = library.name.split(':')
           if (lib[0] === 'net.minecraftforge' && lib[1].includes('forge')) {
@@ -402,7 +394,6 @@ class Handler {
           }
         }
       } else {
-        // Remove the forge dependent since we're going to overwrite the first entry anyways.
         for (const library in json.mavenFiles) {
           const lib = json.mavenFiles[library].name.split(':')
           if (lib[0] === 'net.minecraftforge' && lib[1].includes('forge')) {
@@ -412,7 +403,6 @@ class Handler {
         }
       }
     } else {
-      // Modifying legacy library format to play nice with MCLC's downloadToDirectory function.
       await Promise.all(json.libraries.map(async library => {
         const lib = library.name.split(':')
         if (lib[0] === 'net.minecraftforge' && lib[1].includes('forge')) return
@@ -429,19 +419,15 @@ class Handler {
         }
         library.url = url
         const downloadLink = `${url}${lib[0].replace(/\./g, '/')}/${lib[1]}/${lib[2]}/${name}`
-        // Checking if the file still exists on Forge's server, if not, replace it with the fallback.
-        // Not checking for sucess, only if it 404s.
         this.baseRequest(downloadLink, (error, response, body) => {
           if (error) {
-            this.client.emit('debug', `[MCLC]: Failed checking request for ${downloadLink}`)
+            this.client.emit('debug', `[CaveSpider Core]: Failed checking request for ${downloadLink}`)
           } else {
             if (response.statusCode === 404) library.url = this.options.overrides.url.fallbackMaven
           }
         })
       }))
     }
-    // If a downloads property exists, we modify the inital forge entry to include ${jarEnding} so ForgeWrapper can work properly.
-    // If it doesn't, we simply remove it since we're already providing the universal jar.
     if (json.libraries[0].downloads) {
       const name = json.libraries[0].name
       if (name.includes('minecraftforge:forge') && !name.includes('universal')) {
@@ -453,19 +439,16 @@ class Handler {
       delete json.libraries[0]
     }
 
-    // Removing duplicates and null types
     json.libraries = this.cleanUp(json.libraries)
     if (json.mavenFiles) json.mavenFiles = this.cleanUp(json.mavenFiles)
 
     json.forgeWrapperVersion = this.options.overrides.fw.version
 
-    // Saving file for next run!
     if (!fs.existsSync(path.join(this.options.root, 'forge', this.version.id))) {
       fs.mkdirSync(path.join(this.options.root, 'forge', this.version.id), { recursive: true })
     }
     fs.writeFileSync(versionPath, JSON.stringify(json, null, 4))
 
-    // Make MCLC treat modern forge as a custom version json rather then legacy forge.
     if (this.isModernForge(json)) this.options.forge = null
 
     return json
@@ -494,7 +477,6 @@ class Handler {
           const url = `${library.url}${lib[0].replace(/\./g, '/')}/${lib[1]}/${lib[2]}/${name}`
           await this.downloadAsync(url, jarPath, name, true, eventName)
         } else if (library.downloads && library.downloads.artifact && library.downloads.artifact.url) {
-          // Only download if there's a URL provided. If not, we're assuming it's going a generated dependency.
           await this.downloadAsync(library.downloads.artifact.url, jarPath, name, true, eventName)
         }
       }
@@ -536,10 +518,9 @@ class Handler {
     libs = libs.concat((await this.downloadToDirectory(libraryDirectory, parsed, 'classes')))
     counter = 0
 
-    // Temp Quilt support
     if (classJson) libs.sort()
 
-    this.client.emit('debug', '[MCLC]: Collected class paths')
+    this.client.emit('debug', '[CaveSpider Core]: Collected class paths')
     return libs
   }
 
@@ -561,7 +542,7 @@ class Handler {
     const { type, identifier, path } = this.options.quickPlay
     const keys = Object.keys(types)
     if (!keys.includes(type)) {
-      this.client.emit('debug', `[MCLC]: quickPlay type is not valid. Valid types are: ${keys.join(', ')}`)
+      this.client.emit('debug', `[CaveSpider Core]: quickPlay type is not valid. Valid types are: ${keys.join(', ')}`)
       return null
     }
     const returnArgs = type === 'legacy'
@@ -654,7 +635,7 @@ class Handler {
         if (this.options.window.height) args.push('--height', this.options.window.height)
       }
     }
-    if (this.options.server) this.client.emit('debug', '[MCLC]: server and port are deprecated launch flags. Use the quickPlay field.')
+    if (this.options.server) this.client.emit('debug', '[CaveSpider Core]: server and port are deprecated launch flags. Use the quickPlay field.')
     if (this.options.quickPlay) args = args.concat(this.formatQuickPlay())
     if (this.options.proxy) {
       args.push(
@@ -669,7 +650,7 @@ class Handler {
       )
     }
     args = args.filter(value => typeof value === 'string' || typeof value === 'number')
-    this.client.emit('debug', '[MCLC]: Set launch options')
+    this.client.emit('debug', '[CaveSpider Core]: Set launch options')
     return args
   }
 
@@ -698,10 +679,9 @@ class Handler {
     }
   }
 
-  // To prevent launchers from breaking when they update. Will be reworked with rewrite.
   getMemory () {
     if (!this.options.memory) {
-      this.client.emit('debug', '[MCLC]: Memory not set! Setting 1GB as MAX!')
+      this.client.emit('debug', '[CaveSpider Core]: Memory not set! Setting 1GB as MAX!')
       this.options.memory = {
         min: 512,
         max: 1023
@@ -709,7 +689,7 @@ class Handler {
     }
     if (!isNaN(this.options.memory.max) && !isNaN(this.options.memory.min)) {
       if (this.options.memory.max < this.options.memory.min) {
-        this.client.emit('debug', '[MCLC]: MIN memory is higher then MAX! Resetting!')
+        this.client.emit('debug', '[CaveSpider Core]: MIN memory is higher then MAX! Resetting!')
         this.options.memory.max = 1023
         this.options.memory.min = 512
       }

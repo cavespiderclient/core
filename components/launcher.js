@@ -4,7 +4,7 @@ const Handler = require('./handler')
 const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
 
-class MCLCore extends EventEmitter {
+class CaveSpiderCore extends EventEmitter {
   async launch (options) {
     try {
       this.options = { ...options }
@@ -39,7 +39,7 @@ class MCLCore extends EventEmitter {
 
       const java = await this.handler.checkJava(this.options.javaPath || 'java')
       if (!java.run) {
-        this.emit('debug', `[MCLC]: Couldn't start Minecraft due to: ${java.message}`)
+        this.emit('debug', `[CaveSpider Core]: Couldn't start Minecraft due to: ${java.message}`)
         this.emit('close', 1)
         return null
       }
@@ -60,7 +60,7 @@ class MCLCore extends EventEmitter {
       const nativePath = await this.handler.getNatives()
 
       if (!fs.existsSync(mcPath)) {
-        this.emit('debug', '[MCLC]: Attempting to download Minecraft version jar')
+        this.emit('debug', '[CaveSpider Core]: Attempting to download Minecraft version jar')
         await this.handler.getJar()
       }
 
@@ -107,29 +107,26 @@ class MCLCore extends EventEmitter {
       const classes = this.options.overrides.classes || this.handler.cleanUp(await this.handler.getClasses(modifyJson))
       const classPaths = ['-cp']
       const separator = this.handler.getOS() === 'windows' ? ';' : ':'
-      this.emit('debug', `[MCLC]: Using ${separator} to separate class paths`)
-      // Handling launch arguments.
+      this.emit('debug', `[CaveSpider Core]: Using ${separator} to separate class paths`)
       const file = modifyJson || versionFile
-      // So mods like fabric work.
       const jar = fs.existsSync(mcPath)
         ? `${separator}${mcPath}`
         : `${separator}${path.join(directory, `${this.options.version.number}.jar`)}`
       classPaths.push(`${this.options.forge ? this.options.forge + separator : ''}${classes.join(separator)}${jar}`)
       classPaths.push(file.mainClass)
 
-      this.emit('debug', '[MCLC]: Attempting to download assets')
+      this.emit('debug', '[CaveSpider Core]: Attempting to download assets')
       await this.handler.getAssets()
 
-      // Forge -> Custom -> Vanilla
       const launchOptions = await this.handler.getLaunchOptions(modifyJson)
 
       const launchArguments = args.concat(jvm, classPaths, launchOptions)
       this.emit('arguments', launchArguments)
-      this.emit('debug', `[MCLC]: Launching with arguments ${launchArguments.join(' ')}`)
+      this.emit('debug', `[CaveSpider Core]: Launching with arguments ${launchArguments.join(' ')}`)
 
       return this.startMinecraft(launchArguments)
     } catch (e) {
-      this.emit('debug', `[MCLC]: Failed to start due to ${e}, closing...`)
+      this.emit('debug', `[CaveSpider Core]: Failed to start due to ${e}, closing...`)
       return null
     }
   }
@@ -137,13 +134,13 @@ class MCLCore extends EventEmitter {
   printVersion () {
     if (fs.existsSync(path.join(__dirname, '..', 'package.json'))) {
       const { version } = require('../package.json')
-      this.emit('debug', `[MCLC]: MCLC version ${version}`)
-    } else { this.emit('debug', '[MCLC]: Package JSON not found, skipping MCLC version check.') }
+      this.emit('debug', `[CaveSpider Core]: CaveSpider Core version ${version}`)
+    } else { this.emit('debug', '[CaveSpider Core]: Package JSON not found, skipping CaveSpider Core version check.') }
   }
 
   createRootDirectory () {
     if (!fs.existsSync(this.options.root)) {
-      this.emit('debug', '[MCLC]: Attempting to create root folder')
+      this.emit('debug', '[CaveSpider Core]: Attempting to create root folder')
       fs.mkdirSync(this.options.root)
     }
   }
@@ -159,7 +156,7 @@ class MCLCore extends EventEmitter {
 
   async extractPackage () {
     if (this.options.clientPackage) {
-      this.emit('debug', `[MCLC]: Extracting client package to ${this.options.root}`)
+      this.emit('debug', `[CaveSpider Core]: Extracting client package to ${this.options.root}`)
       await this.handler.extractPackage()
     }
   }
@@ -169,10 +166,10 @@ class MCLCore extends EventEmitter {
 
     if (this.options.forge) {
       this.options.forge = path.resolve(this.options.forge)
-      this.emit('debug', '[MCLC]: Detected Forge in options, getting dependencies')
+      this.emit('debug', '[CaveSpider Core]: Detected Forge in options, getting dependencies')
       modifyJson = await this.handler.getForgedWrapped()
     } else if (this.options.version.custom) {
-      this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file')
+      this.emit('debug', '[CaveSpider Core]: Detected custom in options, setting custom version file')
       modifyJson = modifyJson || JSON.parse(fs.readFileSync(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }))
     }
 
@@ -189,4 +186,4 @@ class MCLCore extends EventEmitter {
   }
 }
 
-module.exports = MCLCore
+module.exports = CaveSpiderCore
