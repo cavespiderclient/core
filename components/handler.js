@@ -16,6 +16,32 @@ class Handler {
     })
   }
 
+  getFabric ({
+    directory,
+    minecraftVersion,
+    loaderVersion
+  }) {
+    const API_URL = `https://meta.fabricmc.net/v2/versions/loader/${minecraftVersion}/${loaderVersion}/profile/json`
+    const fabricLoader = path.join(directory, `fabric-loader-${loaderVersion}-${minecraftVersion}.json`)
+    return new Promise(resolve => {
+      request.get(API_URL, (error, response, body) => {
+        if (error) {
+          this.client.emit('debug', `[CaveSpider Core]: Failed to download Fabric loader due to ${error}`)
+          return resolve(false)
+        }
+        try {
+          const formattedBody = JSON.stringify(JSON.parse(body))
+          fs.writeFileSync(fabricLoader, formattedBody)
+          this.client.emit('debug', '[CaveSpider Core]: Downloaded Fabric loader')
+          resolve(true)
+        } catch (parseError) {
+          this.client.emit('debug', `[CaveSpider Core]: Failed to parse Fabric loader JSON due to ${parseError}`)
+          resolve(false)
+        }
+      })
+    })
+  };
+
   checkJava (java) {
     return new Promise(resolve => {
       child.exec(`"${java}" -version`, (error, stdout, stderr) => {
