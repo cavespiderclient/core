@@ -1,5 +1,5 @@
 {
-  "name": "cavespidercore",
+  "name": "@cavespider/core",
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
@@ -25,5 +25,8 @@
     "Pierce Harriz",
     "Jonas F. Franke <jonasfranke@sdevs.org>"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
 }
