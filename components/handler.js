@@ -911,6 +911,8 @@ class Handler {
         : 482,
     };
 
+    console.log(fields);
+
     if (
       this.options.authorization.meta.demo &&
       (this.options.features
