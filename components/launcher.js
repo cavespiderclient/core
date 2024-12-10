@@ -60,39 +60,12 @@ class CaveSpiderCore extends EventEmitter {
             ? this.options.version.custom
             : this.options.version.number,
         );
-      const fabricDirectory = path.join(
-        this.options.root,
-        'versions',
-        `fabric-loader-${this.options.fabric.version}-${this.options.version.number}`,
-      );
-      const fabricLoader = path.join(
-        fabricDirectory,
-        `fabric-loader-${this.options.fabric.version}-${this.options.version.number}.json`,
-      );
-      const modsFolder = path.join(this.options.root, 'mods');
 
-      if (this.options.fabric) this.options.fabric.directory = fabricDirectory;
+      const modsFolder = path.join(this.options.root, 'mods');
       this.options.directory = directory;
 
-      if (this.options.fabric) {
-        if (!fs.existsSync(modsFolder)) {
-          fs.mkdirSync(modsFolder, { recursive: true });
-        }
-
-        if (!fs.existsSync(fabricDirectory) || !fs.existsSync(fabricLoader)) {
-          this.emit(
-            'debug',
-            '[CaveSpider Core]: Attempting to download Fabric loader',
-          );
-
-          fs.mkdirSync(fabricDirectory, { recursive: true });
-
-          await this.handler.getFabric({
-            directory: fabricDirectory,
-            minecraftVersion: this.options.version.number,
-            loaderVersion: this.options.fabric.version,
-          });
-        }
+      if (!fs.existsSync(modsFolder)) {
+        fs.mkdirSync(modsFolder, { recursive: true });
       }
 
       const versionFile = await this.handler.getVersion();
