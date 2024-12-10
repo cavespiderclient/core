@@ -1,7 +1,7 @@
 /// <reference types="node" />
 
-declare module "core" {
-  type OS = "windows" | "osx" | "linux";
+declare module 'core' {
+  type OS = 'windows' | 'osx' | 'linux';
 
   interface IOverrides {
     /**
@@ -42,7 +42,7 @@ declare module "core" {
     maxSockets?: number;
     /**
      * Urls to the Minecraft and Forge resource servers
-     * 
+     *
      * This is for launcher developers located in countries that have the Minecraft and Forge resource servers
      * blocked for what ever reason. They obviously need to mirror the formatting of the original JSONs / file structures.
      */
@@ -64,7 +64,7 @@ declare module "core" {
        */
       defaultRepoForge?: string;
       /**
-       * 
+       *
        */
       fallbackMaven?: string;
     };
@@ -96,12 +96,12 @@ declare module "core" {
     root: string;
     /**
      * OS override for minecraft natives
-     * 
+     *
      * @default will autodetect
      */
     os?: OS;
     /**
-     * Array of custom Minecraft arguments. 
+     * Array of custom Minecraft arguments.
      */
     customLaunchArgs?: Array<string>;
     /**
@@ -117,8 +117,8 @@ declare module "core" {
      */
     version: {
       /**
-       * Actual version. 
-       * 
+       * Actual version.
+       *
        * @example '1.16.4'
        */
       number: string;
@@ -127,8 +127,8 @@ declare module "core" {
        */
       type: 'release' | 'snapshot' | string;
       /**
-       * 	The name of the folder, jar file, and version json in the version folder. 
-       * 
+       * 	The name of the folder, jar file, and version json in the version folder.
+       *
        * ` CaveSpider Core will look in the `versions` folder for this name
        * @example '1.16.4-fabric'
        */
@@ -145,8 +145,8 @@ declare module "core" {
       min: string | number;
     };
     /**
-     * Path to Forge Jar. 
-     * 
+     * Path to Forge Jar.
+     *
      * Versions below 1.13 should be the "universal" jar while versions above 1.13+ should be the "installer" jar
      */
     forge?: string;
@@ -161,7 +161,7 @@ declare module "core" {
       host: string;
       /**
        *  Username for the proxy.
-       * 
+       *
        * @default 8080
        */
       port?: string;
@@ -179,7 +179,6 @@ declare module "core" {
      */
     timeout?: number;
     window?: {
-
       /**
        * Width of the Minecraft Client
        */
@@ -193,7 +192,6 @@ declare module "core" {
        */
       fullscreen?: boolean;
     };
-
 
     /**
      * Allows the game to be launched directly into a world
@@ -237,8 +235,8 @@ declare module "core" {
     name: string;
     user_properties: Partial<any>;
     meta?: {
-      type: "mojang" | "msa",
-      demo?: boolean
+      type: 'mojang' | 'msa';
+      demo?: boolean;
     };
   }
 
@@ -254,54 +252,55 @@ declare module "core" {
      */
     getAuth(username: string, password?: string): Promise<IUser>;
     /**
-     * 
+     *
      * @param access_token Token being checked if it can be used to login with (online mode)
      * @param client_token Client token being checked to see if there was a change of client (online mode)
      */
     validate(
       access_token: string,
-      client_token: string
+      client_token: string,
     ): Promise<boolean | Partial<any>>;
     /**
-     * 
+     *
      * @param access_token Token being checked if it can be used to login with (online mode)
      * @param client_token Client token being checked to see if there was a change of client (online mode)
      */
-    refreshAuth(
-      access_token: string,
-      client_token: string,
-    ): Promise<IUser>;
+    refreshAuth(access_token: string, client_token: string): Promise<IUser>;
     /**
-     * 
+     *
      * @param access_token Token being checked if it can be used to login with (online mode)
      * @param client_token Client token being checked to see if there was a change of client (online mode)
      */
     invalidate(
       access_token: string,
-      client_token: string
+      client_token: string,
     ): Promise<boolean | Partial<any>>;
     /**
-      * @param username email if using a password, else the username
-      * @param password password for mojang account
-      */
+     * @param username email if using a password, else the username
+     * @param password password for mojang account
+     */
     signOut(
       username: string,
-      password: string
+      password: string,
     ): Promise<boolean | Partial<any>>;
     changeApiUrl(url: string): void;
   }
 
-  import { EventEmitter } from 'events'
-  import { ChildProcessWithoutNullStreams } from 'child_process'
+  import { EventEmitter } from 'events';
+  import { ChildProcessWithoutNullStreams } from 'child_process';
 
   export class Client extends EventEmitter {
-    launch(options: ILauncherOptions): Promise<ChildProcessWithoutNullStreams | null>;
+    launch(
+      options: ILauncherOptions,
+    ): Promise<ChildProcessWithoutNullStreams | null>;
     protected printVersion(): void;
     protected createRootDirectory(): void;
     protected createGameDirectory(): void;
     protected extractPackage(): Promise<void>;
     protected getModifyJson(): Promise<any>;
-    protected startMinecraft(launchArguments: string[]): ChildProcessWithoutNullStreams;
+    protected startMinecraft(
+      launchArguments: string[],
+    ): ChildProcessWithoutNullStreams;
   }
 
   export const Authenticator: IAuthenticator;

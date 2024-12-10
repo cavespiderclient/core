@@ -1,4 +1,4 @@
 module.exports = {
   Client: require('./components/launcher'),
-  Authenticator: require('./components/authenticator')
-}
+  Authenticator: require('./components/authenticator'),
+};
